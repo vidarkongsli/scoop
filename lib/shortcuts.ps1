@@ -2,32 +2,56 @@
 function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
     $shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
     $shortcuts | ?{ $_ -ne $null } | % {
-        $target = $_.item(0)
+        $target = [System.IO.Path]::Combine($dir, $_.item(0))
+        $target = New-Object System.IO.FileInfo($target)
         $name = $_.item(1)
-        startmenu_shortcut "$dir\$target" $name $global
+        $arguments = ""
+        $icon = $null
+        if($_.length -ge 3) {
+            $arguments = $_.item(2)
+        }
+        if($_.length -ge 4) {
+            $icon = [System.IO.Path]::Combine($dir, $_.item(3))
+            $icon = New-Object System.IO.FileInfo($icon)
+        }
+        startmenu_shortcut $target $name $arguments $icon $global
     }
 }
 
 function shortcut_folder($global) {
+    $directory = [System.IO.Path]::Combine([Environment]::GetFolderPath('startmenu'), 'Programs', 'Scoop Apps')
     if($global) {
-        "$([environment]::getfolderpath('commonstartmenu'))\Programs\Scoop Apps"
-        return
+        $directory = [System.IO.Path]::Combine([Environment]::GetFolderPath('commonstartmenu'), 'Programs', 'Scoop Apps')
     }
-    "$([environment]::getfolderpath('startmenu'))\Programs\Scoop Apps"
+    return $(ensure $directory)
 }
 
-function startmenu_shortcut($target, $shortcutName, $global) {
-    if(!(Test-Path $target)) {
+function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $arguments, [System.IO.FileInfo]$icon, $global) {
+    if(!$target.Exists) {
         Write-Host -f DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find $target"
         return
     }
-    $scoop_startmenu_folder = shortcut_folder $global
-    if(!(Test-Path $scoop_startmenu_folder)) {
-        New-Item $scoop_startmenu_folder -type Directory
+    if($icon -and !$icon.Exists) {
+        Write-Host -f DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find icon $icon"
+        return
     }
+
+    $scoop_startmenu_folder = shortcut_folder $global
+    $subdirectory = [System.IO.Path]::GetDirectoryName($shortcutName)
+    if ($subdirectory) {
+        $subdirectory = ensure $([System.IO.Path]::Combine($scoop_startmenu_folder, $subdirectory))
+    }
+
     $wsShell = New-Object -ComObject WScript.Shell
     $wsShell = $wsShell.CreateShortcut("$scoop_startmenu_folder\$shortcutName.lnk")
-    $wsShell.TargetPath = "$target"
+    $wsShell.TargetPath = $target.FullName
+    $wsShell.WorkingDirectory = $target.DirectoryName
+    if ($arguments) {
+        $wsShell.Arguments = $arguments
+    }
+    if($icon -and $icon.Exists) {
+        $wsShell.IconLocation = $icon.FullName
+    }
     $wsShell.Save()
     write-host "Creating shortcut for $shortcutName ($(fname $target))"
 }

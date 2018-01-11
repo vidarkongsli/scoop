@@ -1,17 +1,17 @@
 {
     "homepage": "https://syncthing.net/",
     "license": "MPL-2.0",
-    "version": "0.14.41",
+    "version": "0.14.43",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/syncthing/syncthing/releases/download/v0.14.41/syncthing-windows-amd64-v0.14.41.zip",
-            "hash": "fbdd3ec05ceff3f519249c100389f10c82228d82c5d3df939cf49969a08a97c0",
-            "extract_dir": "syncthing-windows-amd64-v0.14.41"
+            "url": "https://github.com/syncthing/syncthing/releases/download/v0.14.43/syncthing-windows-amd64-v0.14.43.zip",
+            "hash": "3729d9404ed2e5ffb0914ea19284def17f508db378ab107ea850d3d19f7d4efe",
+            "extract_dir": "syncthing-windows-amd64-v0.14.43"
         },
         "32bit": {
-            "url": "https://github.com/syncthing/syncthing/releases/download/v0.14.41/syncthing-windows-386-v0.14.41.zip",
-            "hash": "567186e3f5c70e389a13c2da4e9605321fa9110ede6dee91a3e72f0515525dfe",
-            "extract_dir": "syncthing-windows-386-v0.14.41"
+            "url": "https://github.com/syncthing/syncthing/releases/download/v0.14.43/syncthing-windows-386-v0.14.43.zip",
+            "hash": "e9474641494c40feb7d3d907f4b6197f344b93600b503bfa3f6f17df31131e53",
+            "extract_dir": "syncthing-windows-386-v0.14.43"
         }
     },
     "bin": "syncthing.exe",
